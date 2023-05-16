@@ -1,10 +1,11 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { createUser } from '../services/userAPI';
 
 class Login extends React.Component {
   state = {
     userName: '',
-    isLoading: true,
+    isLoading: false,
   };
 
   handleChange = (event) => {
@@ -23,13 +24,24 @@ class Login extends React.Component {
     return nameInput;
   };
 
-  handleCreateUser = () => {
+  handleClick = async () => {
     const { userName } = this.state;
-    createUser({ name: userName });
+    const { history } = this.props;
+
+    this.setState({ isLoading: true });
+
+    await createUser({ name: userName });
+
+    history.push('/search');
   };
 
   render() {
     const { userName, isLoading } = this.state;
+
+    if (isLoading) {
+      return <p>Carregando...</p>;
+    }
+
     return (
       <div data-testid="page-login">
 
@@ -44,7 +56,7 @@ class Login extends React.Component {
         <div>
           <button
             data-testid="login-submit-button"
-            onClick={ this.handleCreateUser }
+            onClick={ this.handleClick }
             disabled={ !this.buttonDisabled() }
           >
             Entrar
@@ -56,5 +68,11 @@ class Login extends React.Component {
     );
   }
 }
+
+Login.propTypes = {
+  history: PropTypes.shape({
+    push: PropTypes.func.isRequired,
+  }).isRequired,
+};
 
 export default Login;
