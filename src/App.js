@@ -24,6 +24,7 @@ class App extends React.Component {
           <Route exact path="/profile/edit" component={ ProfileEdit } />
           <Route exact path="*" component={ NotFound } />
         </Switch>
+
       </>
     );
   }
