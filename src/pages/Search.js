@@ -5,8 +5,9 @@ import searchAlbumsAPI from '../services/searchAlbumsAPI';
 
 class Search extends React.Component {
   state = {
-    artist: '',
+    currentArtist: '',
     albums: [],
+    artistName: '',
     isLoading: false,
   };
 
@@ -19,42 +20,48 @@ class Search extends React.Component {
   };
 
   buttonDisabled = () => {
-    const { artist } = this.state;
+    const { currentArtist } = this.state;
 
     const characters = 2;
-    const artistInput = artist.length >= characters;
-    return artistInput;
+    const textInput = currentArtist.length >= characters;
+    return textInput;
   };
 
   handleClick = async () => {
-    const { artist, albums, isLoading } = this.state;
+    const { currentArtist } = this.state;
 
     this.setState({ albums: [], isLoading: true });
 
-    const returnedAlbums = await searchAlbumsAPI(artist);
+    const returnedAlbums = await searchAlbumsAPI(currentArtist);
 
-    this.setState({ albums: returnedAlbums });
-    this.setState({ artist: '', isLoading: false });
+    this.setState({ albums: returnedAlbums,
+      currentArtist: '',
+      isLoading: false,
+      artistName: currentArtist });
   };
 
   renderAlbums() {
     const { albums } = this.state;
-    if (albums.length === 0) {
-      return <p>Nenhum álbum foi encontrado</p>;
-    }
 
-    return albums.map((artistAlbum) => (<li key={ artistAlbum.collectionId }>
-      <p>{artistAlbum.collectionName}</p>
-      <Link
-        to={ `/album/${artistAlbum.collectionId}` }
-        data-testid={ `link-to-album-${artistAlbum.collectionId}` }
-      />
-      <img src={ artistAlbum.artworkUrl100 } alt={ artistAlbum.collectionName } />
-    </li>));
+    return albums.map((artistAlbum) => (
+      <li key={ artistAlbum.collectionId }>
+
+        <p>{artistAlbum.collectionName}</p>
+
+        <Link
+          to={ `/album/${artistAlbum.collectionId}` }
+          data-testid={ `link-to-album-${artistAlbum.collectionId}` }
+        />
+
+        <img src={ artistAlbum.artworkUrl100 } alt={ artistAlbum.collectionName } />
+
+        <p>{artistAlbum.artistName}</p>
+
+      </li>));
   }
 
   render() {
-    const { artist, isLoading, albums } = this.state;
+    const { currentArtist, isLoading, albums, artistName } = this.state;
     return (
 
       <div data-testid="page-search">
@@ -62,11 +69,12 @@ class Search extends React.Component {
 
         {isLoading ? (<p>Carregando...</p>) : (
           <>
+
             <input
               type="text"
               data-testid="search-artist-input"
-              name="artist"
-              value={ artist }
+              name="currentArtist"
+              value={ currentArtist }
               onChange={ this.handleChange }
               placeholder="Nome do Artista"
             />
@@ -85,9 +93,15 @@ class Search extends React.Component {
 
         )}
 
-        <div id="albumCard">
-          <ul>{this.renderAlbums()}</ul>
-        </div>
+        { albums.length > 0 && (
+          <div id="albumCard">
+            <p>
+              {`Resultado de álbuns de: ${artistName}`}
+            </p>
+            <ul>{this.renderAlbums()}</ul>
+          </div>)}
+
+        { albums.length === 0 && <p>Nenhum álbum foi encontrado</p> }
 
       </div>
 
