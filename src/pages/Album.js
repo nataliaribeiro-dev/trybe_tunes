@@ -3,15 +3,18 @@ import PropTypes from 'prop-types';
 import Header from '../components/Header';
 import getMusics from '../services/musicsAPI';
 import MusicCard from '../components/MusicCard';
+import { getFavoriteSongs } from '../services/favoriteSongsAPI';
 
 class Album extends React.Component {
   state = {
     data: [],
+    favorites: [],
 
   };
 
   componentDidMount() {
     this.getMusicsAlbum();
+    this.fetchFavoriteMusics();
   }
 
   getMusicsAlbum = async () => {
@@ -20,8 +23,13 @@ class Album extends React.Component {
     this.setState({ data });
   };
 
+  fetchFavoriteMusics = async () => {
+    const favoriteMusics = await getFavoriteSongs();
+    this.setState({ favorites: favoriteMusics });
+  };
+
   render() {
-    const { data } = this.state;
+    const { data, favorites } = this.state;
     const { collectionName, artistName, artworkUrl100 } = data[0] || {}; // para garantir de que a desestruturação só será feita após getMusicsAlbum tiver sido resolvida
 
     return (
@@ -38,7 +46,9 @@ class Album extends React.Component {
             <MusicCard
               key={ index }
               trackName={ music.trackName }
+              id={ music.trackId }
               previewUrl={ music.previewUrl }
+              favorites={ favorites }
               trackId={ music.trackId }
             />
           ))}
