@@ -46,7 +46,6 @@ class Album extends React.Component {
             <MusicCard
               key={ index }
               trackName={ music.trackName }
-              id={ music.trackId }
               previewUrl={ music.previewUrl }
               favorites={ favorites }
               trackId={ music.trackId }
